@@ -1,2 +1,4 @@
 # Theater-Management-System
 This Python app manages theater info using a SQL database. It lets owners add/update show details in real-time, ensuring data consistency. Users can view current theaters and show timings via a dynamic interface, streamlining scheduling and enhancing the viewing experience.
+
+This project is a Python-based application designed to manage theater information efficiently. It takes user inputs such as theater names and show timings and stores them securely in a SQL database. Theater owners can update show details dynamically through the interface. The application retrieves and displays the latest theater names and show timings from the database for end-users. SQL queries are used for insert, update, and fetch operations, ensuring data consistency and real-time updates. The system streamlines theater scheduling and provides a user-friendly display of current shows.
