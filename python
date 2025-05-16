@@ -1,0 +1,125 @@
+import sys
+import pymysql
+
+def get_connection():
+    conn = pymysql.Connect(
+        host='localhost', port=3306,
+        user='root', password='Your_password',
+        db='your_db', charset='utf8')
+    return conn   
+
+def insert():
+    theater_name = input('Enter theater name: ')
+    location = input('Enter theater location: ')
+    movie_1 = input('Enter the name of Movie 1: ')
+    movie1_time = input('Enter the show timings(hh:mm): ')
+    movie_2 = input('Enter the name of Movie 2: ')
+    movie2_time = input('Enter the show timings(hh:mm): ')
+
+
+    conn = get_connection()
+    my_cursor = conn.cursor()
+    insert_query = """insert into theaters
+    (theater_name, location, movie_1, movie1_time, movie_2,
+    movie2_time) values(%s, %s, %s, %s, %s, %s)"""
+
+    theater_record = (theater_name, location, movie_1, movie1_time, movie_2, movie2_time)
+    my_cursor.execute(insert_query, theater_record) 
+    conn.commit()
+
+    my_cursor.close()
+    conn.close()
+    return "Successfully inserted a row"
+    
+def search_one():
+    theater_id = input('Enter theater ID to search record: ')
+    conn = get_connection()
+    search_query = """ select * from theaters where id = %s"""
+    my_cursor = conn.cursor()
+    my_cursor.execute(search_query, theater_id)
+    row_data = my_cursor.fetchone()
+    if row_data == None:
+        return 'Theater with ID:{} not found'.format(theater_id)
+    print(f'Theater details are: ')
+    print(str(row_data))
+    return '\n Theater with ID: {} details displayed successfully'.format(theater_id)
+
+def print_records(rows):
+    print('%-5s %-18s %-18s %-15s %-15s %-15s %-15s'%("ID", "THEATER_NAME", "LOCATION", "MOVIE_1", "MOVIE1_TIME", "MOVIE_2", "MOVIE2_TIME"))
+
+    for row in rows:
+        print('%-5s %-18s %-18s %-15s %-15s %-15s %-15s'%(row[0], row[1], row[2], row[3], row[4], row[5], row[6]))
+  
+def list_all():
+    conn = get_connection()
+    my_cursor = conn.cursor()
+    sql_query = 'select * from theaters'
+    my_cursor.execute(sql_query)
+    table_data = my_cursor.fetchall()
+    if table_data == None:
+        return 'No rows available in the table'
+    my_cursor.close()
+    conn.close()
+
+    print_records(table_data)
+    return 'All records fetched and printed successfully'
+
+def update_one():
+    theater_id = int(input('Enter ID of the theater to update the record: '))
+    new_name = input('Enter the new theater name to be updated: ')
+    new_location = input('Enter the location of new theater: ')
+
+    my_connection = get_connection()
+    my_cursor = my_connection.cursor()
+
+    update_query = """update theaters set theater_name=%s, location=%s where id=%s"""
+    new_theater_data = (new_name, new_location, theater_id)
+    my_cursor.execute(update_query, new_theater_data) 
+    my_connection.commit()
+    my_cursor.close() 
+    my_connection.close()
+    if my_cursor.rowcount == 1:
+        return 'Record updated and saved successfully'
+    else:
+        return 'Record with ID: {} not found'.format(theater_id)
+
+def delete_one():
+    theater_id = int(input('Enter ID of the theater to delete the record: '))
+
+    my_connection = get_connection()
+    my_cursor = my_connection.cursor()
+
+    delete_query = """delete from theaters where id=%s"""
+    my_cursor.execute(delete_query, theater_id) 
+    my_connection.commit()
+    my_cursor.close() 
+    my_connection.close()
+    if my_cursor.rowcount == 1:
+        return 'Record with ID:{} deleted successfully'.format(theater_id)
+    else:
+        return 'Record with ID: {} not found'.format(theater_id)
+
+def exit_program():
+    sys.exit('End of program')
+
+def invalid_choice():
+    return 'Invalid choice entered'
+
+def start_app():
+    crud_options = {
+        1 : insert,
+        2 : search_one,
+        3 : list_all,
+        4 : update_one,
+        5 : delete_one,
+        6 : exit_program
+    } 
+    count_of_oprs = 20
+    while count_of_oprs >= 1:
+        print('1:Insert 2:Search 3:Display 4:Update 5:Delete 6:Exit')
+        choice = int(input('Your choice please: '))
+        print(crud_options.get(choice, invalid_choice)() )
+        count_of_oprs -= 1
+    print('End of program')
+
+start_app()
